@@ -1,0 +1,88 @@
+//////LOGIN microservicio autenticacion////////
+POST 
+http://localhost:8086/api/auth/login
+
+{
+  "rut": "11111111-1",
+  "contrasena": "admin123"
+}
+
+
+//////CREAR USUARIO microservicio usuarios////////
+
+http://localhost:8081/api/usuarios
+
+{
+  "rut": "44444444-4",
+  "nombre": "Nuevo",
+  "apellido": "Usuario",
+  "correo": "nuevo@correo.cl",
+  "telefono": "+56944444444",
+  "contrasena": "nuevo123",
+  "rol": {
+    "id": 3,
+    "nombre": "CLIENTE"
+  }
+}
+
+
+//////CREAR CONSULTA microservicio consultas////////
+
+http://localhost:8091/api/consultas
+
+
+{
+    "idMascota": 1,
+    "idVeterinario": 1,  
+    "idCliente": 1,      
+    "fecha": "2025-07-20",
+    "motivo": "Chequeo general",
+    "diagnostico": "buen estado",
+    "tratamiento": "Ninguno"
+}
+
+
+
+//////CREAR MASCOTA microservicio mascotas////////
+
+http://localhost:8090/api/mascotas
+
+{
+    "idCliente": 2,
+    "nombre": "lukas",
+    "especie": "Perro",
+    "raza": "Puddle",
+    "edad": 3
+}
+
+//////CREAR NOTIFICACION microservicio notificaciones////////
+
+http://localhost:8084/api/notificaciones
+
+{
+    "idUsuario": 2,
+    "mensaje": "¡Su mascota Firulais tiene una cita de seguimiento mañana a las 10 AM!"
+}
+
+//////CREAR RESEÑA microservicio resenas////////
+
+http://localhost:8087/api/resenas
+
+{
+    "idCliente": 2,
+    "idVeterinario": 3,
+    "calificacion": 5,
+    "comentario": "Excelente servicio"
+}
+
+
+
+//////AGREGAR MEDICAMENTOS microservicio inventario////////
+
+http://localhost:8085/api/medicamentos
+
+{
+    "nombre": "Ibuprofeno 400mg",
+    "stock": 150,
+    "fechaVencimiento": "2026-12-31"
+}
