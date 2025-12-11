@@ -56,16 +56,18 @@ public class ConsultaController {
 
     @Operation(summary = "Crear una nueva consulta", description = "Registra una nueva consulta en la base de datos.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Consulta creada exitosamente",
+            @ApiResponse(responseCode = "201", description = "Consulta creada exitosamente",
                     content = @Content(schema = @Schema(implementation = Consulta.class))),
-            @ApiResponse(responseCode = "400", description = "Datos de consulta inválidos o error de negocio")
+            @ApiResponse(responseCode = "400", description = "Datos de consulta inválidos o error de negocio"),
+            @ApiResponse(responseCode = "404", description = "Mascota, veterinario o cliente no encontrado")
     })
     @PostMapping
     public ResponseEntity<?> crear(
             @Parameter(description = "Objeto Consulta a crear", required = true)
             @Valid @RequestBody Consulta consulta) {
         try {
-            return ResponseEntity.ok(service.guardar(consulta));
+            Consulta consultaCreada = service.guardar(consulta);
+            return ResponseEntity.status(HttpStatus.CREATED).body(consultaCreada);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

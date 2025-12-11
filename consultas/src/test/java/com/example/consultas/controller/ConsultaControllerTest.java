@@ -42,14 +42,14 @@ public class ConsultaControllerTest {
     }
 
     @Test
-    void crearConsulta_valida_retorna200() throws Exception {
+    void crearConsulta_valida_retorna201() throws Exception {
         Consulta consulta = getConsultaEjemplo();
         when(service.guardar(any(Consulta.class))).thenReturn(consulta);
 
         mockMvc.perform(post("/api/consultas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(consulta)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.motivo").value("Chequeo"));
     }
 

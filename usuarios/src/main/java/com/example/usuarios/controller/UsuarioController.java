@@ -25,7 +25,7 @@ public class UsuarioController {
 
     @Operation(summary = "Crear un nuevo usuario", description = "Registra un usuario en el sistema.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente",
+            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente",
                     content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "400", description = "Datos de usuario inválidos (ej. validaciones fallidas)")
     })
@@ -33,7 +33,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> crear(
             @Parameter(description = "Objeto Usuario a crear. Contraseña será encriptada.", required = true)
             @Valid @RequestBody Usuario usuario) {
-        return ResponseEntity.ok(service.guardar(usuario));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
     }
 
     @Operation(summary = "Listar todos los usuarios", description = "Obtiene una lista de todos los usuarios registrados.")
@@ -87,5 +87,75 @@ public class UsuarioController {
         return service.buscarPorCorreo(correo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Actualizar información del usuario", description = "Actualiza el nombre, apellido y teléfono de un usuario.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Información actualizada exitosamente",
+                    content = @Content(schema = @Schema(implementation = Usuario.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos (nombre o teléfono requeridos)"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarInformacion(
+            @Parameter(description = "ID del usuario a actualizar", example = "1", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Datos a actualizar", required = true)
+            @RequestBody java.util.Map<String, String> datos) {
+        try {
+            String nombre = datos.get("nombre");
+            String apellido = datos.get("apellido");
+            String telefono = datos.get("telefono");
+
+            if (nombre == null || nombre.isBlank()) {
+                return ResponseEntity.badRequest().body("El nombre es requerido");
+            }
+            if (telefono == null || telefono.isBlank()) {
+                return ResponseEntity.badRequest().body("El teléfono es requerido");
+            }
+
+            Usuario actualizado = service.actualizarInformacion(id, nombre, apellido, telefono);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar la información: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Cambiar contraseña del usuario", description = "Cambia la contraseña de un usuario verificando la contraseña actual.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contraseña actualizada exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Contraseña actual incorrecta, datos inválidos o campos requeridos faltantes"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/{id}/contrasena")
+    public ResponseEntity<?> cambiarContrasena(
+            @Parameter(description = "ID del usuario", example = "1", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Contraseña actual y nueva contraseña", required = true)
+            @RequestBody java.util.Map<String, String> datos) {
+        try {
+            String contrasenaActual = datos.get("contrasenaActual");
+            String nuevaContrasena = datos.get("nuevaContrasena");
+
+            if (contrasenaActual == null || contrasenaActual.isBlank()) {
+                return ResponseEntity.badRequest().body("La contraseña actual es requerida");
+            }
+            if (nuevaContrasena == null || nuevaContrasena.isBlank()) {
+                return ResponseEntity.badRequest().body("La nueva contraseña es requerida");
+            }
+
+            service.cambiarContrasena(id, contrasenaActual, nuevaContrasena);
+            return ResponseEntity.ok().body("Contraseña actualizada exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al cambiar la contraseña: " + e.getMessage());
+        }
     }
 }

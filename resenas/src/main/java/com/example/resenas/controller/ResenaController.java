@@ -28,18 +28,34 @@ public class ResenaController {
 
     @Operation(summary = "Crear una nueva reseña", description = "Registra una nueva reseña o calificación de un servicio veterinario.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reseña creada exitosamente",
+            @ApiResponse(responseCode = "201", description = "Reseña creada exitosamente",
                     content = @Content(schema = @Schema(implementation = Resena.class))),
-            @ApiResponse(responseCode = "400", description = "Datos de reseña inválidos o error de negocio")
+            @ApiResponse(responseCode = "400", description = "Datos de reseña inválidos o error de negocio (calificación fuera de rango, comentario vacío, rol inválido)"),
+            @ApiResponse(responseCode = "404", description = "Cliente o veterinario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping
     public ResponseEntity<?> crear(
             @Parameter(description = "Objeto Reseña a crear", required = true)
             @Valid @RequestBody Resena resena) {
         try {
-            return ResponseEntity.ok(service.guardar(resena));
+            System.out.println("📥 Recibiendo solicitud para crear reseña:");
+            System.out.println("   - ID Cliente: " + resena.getIdCliente());
+            System.out.println("   - ID Veterinario: " + resena.getIdVeterinario());
+            System.out.println("   - Calificación: " + resena.getCalificacion());
+            System.out.println("   - Comentario: " + resena.getComentario());
+            
+            Resena guardada = service.guardar(resena);
+            System.out.println("✅ Reseña creada exitosamente con ID: " + guardada.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
         } catch (IllegalArgumentException e) {
+            System.out.println("❌ Error de validación: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("❌ Error inesperado al crear reseña: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la reseña: " + e.getMessage());
         }
     }
 

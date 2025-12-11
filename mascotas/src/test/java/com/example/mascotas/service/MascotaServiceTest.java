@@ -5,17 +5,17 @@ import com.example.mascotas.repository.MascotaRepository;
 import com.example.mascotas.webclient.UsuarioClient;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class MascotaServiceTest {
 
     @Mock
@@ -28,7 +28,7 @@ public class MascotaServiceTest {
     private MascotaService service;
 
     Mascota getMascotaEjemplo() {
-        return new Mascota(1L, 2L, "Fido", "Perro", "Labrador", 4);
+        return new Mascota(1L, 2L, "Fido", "Perro", "Labrador", 4, null);
     }
 
     @Test

@@ -41,14 +41,14 @@ public class UsuarioControllerTest {
     }
 
     @Test
-    void crearUsuario_retorna200() throws Exception {
+    void crearUsuario_retorna201() throws Exception {
         Usuario usuario = getEjemploUsuario();
         when(service.guardar(any(Usuario.class))).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(usuario)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nombre").value("Luis"))
                 .andExpect(jsonPath("$.rut").value("12345678-9"));
     }

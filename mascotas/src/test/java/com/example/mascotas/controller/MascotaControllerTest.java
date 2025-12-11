@@ -35,24 +35,24 @@ public class MascotaControllerTest {
     private ObjectMapper objectMapper;
 
     Mascota getMascotaEjemplo() {
-        return new Mascota(1L, 2L, "Fido", "Perro", "Labrador", 4);
+        return new Mascota(1L, 2L, "Fido", "Perro", "Labrador", 4, null);
     }
 
     @Test
-    void crearMascota_valida_retorna200() throws Exception {
+    void crearMascota_valida_retorna201() throws Exception {
         Mascota mascota = getMascotaEjemplo();
         Mockito.when(mascotaService.guardar(any(Mascota.class))).thenReturn(mascota);
 
         mockMvc.perform(post("/api/mascotas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mascota)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nombre").value("Fido"));
     }
 
     @Test
     void crearMascota_invalida_retorna400() throws Exception {
-        Mascota mascotaInvalida = new Mascota(null, null, "", null, null, 0); // nombre en blanco y cliente null
+        Mascota mascotaInvalida = new Mascota(null, null, "", null, null, 0, null); // nombre en blanco y cliente null
 
         mockMvc.perform(post("/api/mascotas")
                 .contentType(MediaType.APPLICATION_JSON)

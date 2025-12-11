@@ -38,19 +38,30 @@ public class MascotaService {
     }
 
     public void subirFoto(Long id, byte[] foto) {
+        System.out.println("📸 Subiendo foto para mascota ID: " + id + ", tamaño: " + (foto != null ? foto.length : 0) + " bytes");
         Mascota mascota = obtener(id);
         if (mascota == null) {
+            System.out.println("❌ Mascota no encontrada con ID: " + id);
             throw new IllegalArgumentException("Mascota no encontrada");
         }
         mascota.setFoto(foto);
         repository.save(mascota);
+        System.out.println("✅ Foto guardada para mascota ID: " + id);
     }
 
     public byte[] obtenerFoto(Long id) {
+        System.out.println("🔍 Buscando foto para mascota ID: " + id);
         Mascota mascota = obtener(id);
         if (mascota == null) {
+            System.out.println("❌ Mascota no encontrada con ID: " + id);
             throw new IllegalArgumentException("Mascota no encontrada");
         }
-        return mascota.getFoto();
+        byte[] foto = mascota.getFoto();
+        if (foto == null || foto.length == 0) {
+            System.out.println("⚠️ Mascota ID: " + id + " no tiene foto");
+        } else {
+            System.out.println("✅ Foto encontrada para mascota ID: " + id + ", tamaño: " + foto.length + " bytes");
+        }
+        return foto;
     }
 }

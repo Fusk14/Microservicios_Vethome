@@ -60,6 +60,33 @@ public class UsuarioService {
         return rolRepository.findAll();
     }
 
+    public Usuario actualizarInformacion(Long id, String nombre, String apellido, String telefono) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        
+        usuario.setNombre(nombre);
+        if (apellido != null && !apellido.isBlank()) {
+            usuario.setApellido(apellido);
+        }
+        usuario.setTelefono(telefono);
+        
+        return usuarioRepository.save(usuario);
+    }
+
+    public void cambiarContrasena(Long id, String contrasenaActual, String nuevaContrasena) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        
+        // Verificar que la contraseña actual sea correcta
+        if (!passwordEncoder.matches(contrasenaActual, usuario.getContrasena())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+        
+        // Encriptar y guardar la nueva contraseña
+        usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
+        usuarioRepository.save(usuario);
+    }
+
     
 }
 

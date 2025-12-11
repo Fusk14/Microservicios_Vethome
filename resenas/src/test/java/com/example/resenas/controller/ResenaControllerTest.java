@@ -32,14 +32,14 @@ public class ResenaControllerTest {
     private ObjectMapper mapper;
 
     @Test
-    void crear_resenaValida_retorna200() throws Exception {
+    void crear_resenaValida_retorna201() throws Exception {
         Resena r = new Resena(null, 2L, 3L, 5, "Comentario");
         Mockito.when(service.guardar(any(Resena.class))).thenReturn(r);
 
         mockMvc.perform(post("/api/resenas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(r)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.comentario").value("Comentario"));
     }
 
