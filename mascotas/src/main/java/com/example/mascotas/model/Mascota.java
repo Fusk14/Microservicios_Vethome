@@ -35,4 +35,9 @@ public class Mascota {
 
     @Schema(description = "Edad de la mascota en años", example = "5", defaultValue = "0", nullable = true)
     private int edad;
+
+    @Lob
+    @Column(name = "foto", columnDefinition = "LONGBLOB")
+    @Schema(description = "Foto de la mascota en formato BLOB", nullable = true)
+    private byte[] foto;
 }

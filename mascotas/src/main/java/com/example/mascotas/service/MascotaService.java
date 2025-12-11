@@ -36,4 +36,21 @@ public class MascotaService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    public void subirFoto(Long id, byte[] foto) {
+        Mascota mascota = obtener(id);
+        if (mascota == null) {
+            throw new IllegalArgumentException("Mascota no encontrada");
+        }
+        mascota.setFoto(foto);
+        repository.save(mascota);
+    }
+
+    public byte[] obtenerFoto(Long id) {
+        Mascota mascota = obtener(id);
+        if (mascota == null) {
+            throw new IllegalArgumentException("Mascota no encontrada");
+        }
+        return mascota.getFoto();
+    }
 }

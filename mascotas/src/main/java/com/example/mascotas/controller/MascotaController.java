@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -76,5 +77,66 @@ public class MascotaController {
             @PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Subir foto de una mascota", description = "Sube una imagen para una mascota específica.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Foto subida exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Archivo inválido o mascota no encontrada"),
+            @ApiResponse(responseCode = "404", description = "Mascota no encontrada")
+    })
+    @PostMapping("/{id}/foto")
+    public ResponseEntity<?> subirFoto(
+            @Parameter(description = "ID de la mascota", example = "1", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Archivo de imagen", required = true)
+            @RequestParam("foto") MultipartFile foto) {
+        try {
+            if (foto.isEmpty()) {
+                return ResponseEntity.badRequest().body("El archivo está vacío");
+            }
+            if (!foto.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().body("El archivo debe ser una imagen");
+            }
+            service.subirFoto(id, foto.getBytes());
+            return ResponseEntity.ok().body("Foto subida exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la imagen: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Obtener foto de una mascota", description = "Obtiene la imagen de una mascota específica.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Foto obtenida exitosamente",
+                    content = @Content(mediaType = "image/jpeg")),
+            @ApiResponse(responseCode = "404", description = "Mascota no encontrada o sin foto")
+    })
+    @GetMapping("/{id}/foto")
+    public ResponseEntity<byte[]> obtenerFoto(
+            @Parameter(description = "ID de la mascota", example = "1", required = true)
+            @PathVariable Long id) {
+        try {
+            byte[] foto = service.obtenerFoto(id);
+            if (foto == null || foto.length == 0) {
+                return ResponseEntity.notFound().build();
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentLength(foto.length);
+            // Agregar headers para CORS y cache
+            headers.set("Access-Control-Allow-Origin", "*");
+            headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            headers.set("Access-Control-Allow-Headers", "*");
+            headers.setCacheControl("public, max-age=3600"); // Cache por 1 hora
+            headers.set("Content-Disposition", "inline; filename=\"pet_" + id + ".jpg\"");
+            return ResponseEntity.ok().headers(headers).body(foto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
