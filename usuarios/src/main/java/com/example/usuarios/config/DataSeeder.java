@@ -29,12 +29,13 @@ public class DataSeeder {
                 Rol vetRol = rolRepo.findByNombre("VETERINARIO").orElseThrow();
                 Rol clienteRol = rolRepo.findByNombre("CLIENTE").orElseThrow();
 
+                // Usuario admin con correo válido para el frontend (@duoc.cl)
                 userRepo.save(new Usuario(
                         null,
                         "11111111-1",
                         "Admin",
                         "Principal",
-                        "admin@petcare.cl",
+                        "admin@duoc.cl",
                         "+56911111111",
                         encoder.encode("admin123"),
                         adminRol

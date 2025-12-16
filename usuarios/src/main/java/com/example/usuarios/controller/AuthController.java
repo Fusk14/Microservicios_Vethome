@@ -31,7 +31,8 @@ public class AuthController {
 
     @Operation(summary = "Iniciar sesión en el sistema")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login exitoso"),
+            @ApiResponse(responseCode = "200", description = "Login exitoso",
+                    content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     })
     @PostMapping("/login")
@@ -42,7 +43,10 @@ public class AuthController {
                     if (!passwordOk) {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
                     }
-                    return ResponseEntity.ok("Login exitoso para el usuario: " + usuario.getCorreo());
+                    // Devolver el usuario completo para que el frontend pueda usarlo directamente
+                    // No incluir la contraseña en la respuesta
+                    usuario.setContrasena(null);
+                    return ResponseEntity.ok(usuario);
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas"));
     }

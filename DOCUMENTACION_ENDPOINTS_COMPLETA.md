@@ -16,7 +16,7 @@ https://rvhcfwb0-8081.brs.devtunnels.ms/
 #### 1. Login de Usuario
 - **Método:** `POST`
 - **Ruta:** `/api/auth/login`
-- **Descripción:** Autentica un usuario con correo y contraseña
+- **Descripción:** Autentica un usuario con correo y contraseña. Devuelve el usuario completo (sin contraseña) si las credenciales son válidas.
 - **Request Body:**
   ```json
   {
@@ -24,9 +24,9 @@ https://rvhcfwb0-8081.brs.devtunnels.ms/
     "contrasena": "password123"
   }
   ```
-- **Response:** `String` (mensaje de éxito)
+- **Response:** `Usuario` (objeto usuario completo sin contraseña)
 - **Códigos de Respuesta:**
-  - `200 OK`: Login exitoso
+  - `200 OK`: Login exitoso, devuelve el usuario autenticado
   - `401 Unauthorized`: Credenciales inválidas
 
 #### 2. Registro de Usuario
@@ -375,4 +375,9 @@ https://rvhcfwb0-8086.brs.devtunnels.ms/
 3. **Swagger**: Todos los endpoints están documentados con Swagger/OpenAPI
 4. **Fotos**: Las fotos de mascotas se almacenan como BLOB en la base de datos
 5. **Seguridad**: Las contraseñas se encriptan usando `PasswordEncoder` de Spring Security
+6. **Usuario Admin Precargado**: El sistema crea automáticamente un usuario administrador al iniciar si no existe:
+   - **Correo**: `admin@duoc.cl`
+   - **Contraseña**: `admin123`
+   - **Rol**: `ADMINISTRATIVO`
+   - **RUT**: `11111111-1`
 
